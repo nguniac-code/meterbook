@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Register user — Meterbook{% endblock %}
+{% block content %}
+
+<h1>Register a user</h1>
+<p class="lede">Create a login account for someone who needs access to Meterbook.</p>
+
+<div class="card">
+  <form action="{{ url_for('register_user') }}" method="POST" autocomplete="off">
+    <label for="username">Username</label>
+    <input type="text" id="username" name="username" minlength="3" maxlength="32"
+           autocomplete="username" required value="{{ username }}">
+    <div class="hint">Use 3–32 characters.</div>
+
+    <label for="password">Password</label>
+    <input type="password" id="password" name="password" minlength="8"
+           autocomplete="new-password" required>
+    <div class="hint">Use at least 8 characters.</div>
+
+    <label for="confirm_password">Confirm password</label>
+    <input type="password" id="confirm_password" name="confirm_password"
+           autocomplete="new-password" required>
+
+    <button type="submit">Create user account</button>
+  </form>
+</div>
+{% endblock %}

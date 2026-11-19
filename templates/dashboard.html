@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+{% block title %}Dashboard — Meterbook{% endblock %}
+{% block content %}
+
+<h1>Dashboard</h1>
+<p class="lede">How the readings are coming out.</p>
+
+<div class="period">
+  <a href="{{ url_for('dashboard') }}" class="{{ 'on' if period == 'month' }}">This month</a>
+  <a href="{{ url_for('dashboard', period='all') }}" class="{{ 'on' if period == 'all' }}">All time</a>
+</div>
+
+{% if totals.total == 0 %}
+  <p class="empty">
+    No readings {{ 'this month' if period == 'month' else 'yet' }}.
+    {% if meter_count == 0 %}
+      Start by <a href="{{ url_for('register') }}">registering a meter</a>, then enter its first reading.
+    {% else %}
+      <a href="{{ url_for('entry') }}">Enter a reading</a> to get things going.
+    {% endif %}
+  </p>
+{% else %}
+
+  <p class="summary">
+    {{ totals.total }} reading{{ '' if totals.total == 1 else 's' }}
+    {{ 'this month' if period == 'month' else 'so far' }}:
+    <b class="good">{{ totals.correct }} correct ({{ correct_pct }}%)</b>
+    and
+    <b class="bad">{{ totals.flagged }} flagged ({{ flagged_pct }}%)</b>.
+  </p>
+
+  <div class="bar" title="correct vs flagged">
+    <div class="ok" style="width: {{ correct_pct }}%"></div>
+    <div class="flag" style="width: {{ flagged_pct }}%"></div>
+  </div>
+  <div class="barkey">green = correct, rust = flagged for a second look</div>
+
+  <div class="meterline">
+    <b>{{ meters_read }}</b> of <b>{{ meter_count }}</b> registered meters read
+    {{ 'this month' if period == 'month' else 'at least once' }}.
+    {% if unread_total > 0 %}
+      Still waiting on {{ unread_total }}:
+      <ul>
+        {% for m in unread %}
+          <li><a href="{{ url_for('entry', meter=m.meter_number) }}">{{ m.meter_number }}</a>
+              — {{ m.customer_name }}, {{ m.area }}</li>
+        {% endfor %}
+        {% if unread_total > unread|length %}
+          <li class="small">and {{ unread_total - unread|length }} more</li>
+        {% endif %}
+      </ul>
+    {% endif %}
+  </div>
+
+  {% if reasons %}
+  <h2>Why readings were flagged</h2>
+  <div class="tablewrap">
+    <table>
+      <tr><th>Reason</th><th class="num">Readings</th></tr>
+      {% for r in reasons %}
+      <tr><td>{{ r.flag_reason }}</td><td class="num">{{ r.n }}</td></tr>
+      {% endfor %}
+    </table>
+  </div>
+  {% endif %}
+
+  <h2>By area</h2>
+  <div class="tablewrap">
+    <table>
+      <tr><th>Area</th><th class="num">Readings</th><th class="num">Flagged</th><th>Error rate</th></tr>
+      {% for a in areas %}
+      <tr>
+        <td>{{ a.area }}</td>
+        <td class="num">{{ a.total }}</td>
+        <td class="num">{{ a.flagged }}</td>
+        <td>{{ a.error_pct }}%<span class="minibar"><i style="width: {{ a.error_pct }}%"></i></span></td>
+      </tr>
+      {% endfor %}
+    </table>
+  </div>
+
+  {% if recent_flagged %}
+  <h2>Latest flagged readings</h2>
+  <div class="tablewrap">
+    <table>
+      <tr><th>Date</th><th>Meter</th><th>Customer</th><th class="num">Previous</th><th class="num">Current</th><th>Reason</th></tr>
+      {% for r in recent_flagged %}
+      <tr class="flag">
+        <td>{{ r.reading_date }}</td>
+        <td>{{ r.meter_number }}</td>
+        <td>{{ r.customer_name }}</td>
+        <td class="num">{{ r.previous_reading|num }}</td>
+        <td class="num">{{ r.current_reading|num }}</td>
+        <td class="wrapok">{{ r.flag_reason }}</td>
+      </tr>
+      {% endfor %}
+    </table>
+  </div>
+  <p class="small"><a href="{{ url_for('records', status='flagged') }}">See all flagged readings</a></p>
+  {% endif %}
+
+{% endif %}
+{% endblock %}

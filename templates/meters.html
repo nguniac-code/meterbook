@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}Meters — Meterbook{% endblock %}
+{% block content %}
+
+<h1>Meters</h1>
+<p class="lede">Every registered meter and how it has been doing.</p>
+
+<a class="toplink" href="{{ url_for('register') }}">+ Register a new meter</a>
+
+{% if rows %}
+<div class="tablewrap">
+  <table>
+    <tr>
+      <th>Meter</th><th>Customer</th><th>Area</th><th>Type</th>
+      <th class="num">Readings</th><th class="num">Flagged</th><th>Last read</th><th></th>
+    </tr>
+    {% for m in rows %}
+    <tr>
+      <td>{{ m.meter_number }}</td>
+      <td>{{ m.customer_name }}</td>
+      <td>{{ m.area }}</td>
+      <td>{{ m.meter_type }}</td>
+      <td class="num">{{ m.n_readings }}</td>
+      <td class="num">{{ m.n_flagged }}</td>
+      <td>{{ m.last_read or 'not yet' }}</td>
+      <td><a href="{{ url_for('entry', meter=m.meter_number) }}">Read</a></td>
+    </tr>
+    {% endfor %}
+  </table>
+</div>
+{% else %}
+  <p class="empty">No meters registered yet.</p>
+{% endif %}
+{% endblock %}

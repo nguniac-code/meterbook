@@ -1,0 +1,7 @@
+DB_HOST=127.0.0.1
+DB_PORT=5432
+DB_NAME=meter_readings_db
+DB_USER=postgres
+DB_PASSWORD=3927229
+APP_USERNAME=admin
+APP_PASSWORD=change-me-123

@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}All readings — Meterbook{% endblock %}
+{% block content %}
+
+<h1>All readings</h1>
+<p class="lede">Newest first. Flagged readings are shaded.</p>
+
+<div class="filters">
+  <a href="{{ url_for('records') }}" class="{{ 'on' if status == 'all' }}">All</a>
+  <a href="{{ url_for('records', status='correct') }}" class="{{ 'on' if status == 'correct' }}">Correct</a>
+  <a href="{{ url_for('records', status='flagged') }}" class="{{ 'on' if status == 'flagged' }}">Flagged</a>
+</div>
+
+{% if rows %}
+<div class="tablewrap">
+  <table>
+    <tr>
+      <th>ID</th><th>Date</th><th>Meter</th><th>Customer</th><th>Area</th>
+      <th class="num">Previous</th><th class="num">Current</th><th class="num">Used</th>
+      <th>Status</th><th>Notes</th>
+    </tr>
+    {% for r in rows %}
+    <tr class="{{ 'flag' if r.status == 'flagged' }}">
+      <td>{{ r.id }}</td>
+      <td>{{ r.reading_date }}</td>
+      <td>{{ r.meter_number }}</td>
+      <td>{{ r.customer_name }}</td>
+      <td>{{ r.area }}</td>
+      <td class="num">{{ r.previous_reading|num }}</td>
+      <td class="num">{{ r.current_reading|num }}</td>
+      <td class="num">{{ r.consumption|num }}</td>
+      <td class="wrapok">
+        {% if r.status == 'flagged' %}<span class="tag-flag">Flagged: {{ r.flag_reason }}</span>
+        {% else %}<span class="tag-ok">Correct</span>{% endif %}
+      </td>
+      <td class="wrapok">{{ r.notes or '' }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+</div>
+{% else %}
+  <p class="empty">Nothing to show here yet.</p>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Register meter — Meterbook{% endblock %}
+{% block content %}
+
+<h1>Register a meter</h1>
+<p class="lede">Do this once for each meter, before its first reading.</p>
+
+<div class="card">
+  <form action="{{ url_for('register') }}" method="POST">
+    <label for="meter_number">Meter number</label>
+    <input type="text" id="meter_number" name="meter_number" required
+           placeholder="e.g. MTR-0452" value="{{ form.meter_number or '' }}">
+
+    <label for="customer_name">Customer name</label>
+    <input type="text" id="customer_name" name="customer_name" required value="{{ form.customer_name or '' }}">
+
+    <label for="area">Area / District</label>
+    <input type="text" id="area" name="area" list="areas" required
+           placeholder="e.g. Bakau" value="{{ form.area or '' }}">
+    <datalist id="areas">
+      {% for a in areas %}<option value="{{ a }}">{% endfor %}
+    </datalist>
+
+    <label for="address">House / compound (optional)</label>
+    <input type="text" id="address" name="address" value="{{ form.address or '' }}">
+
+    <div class="row2">
+      <div>
+        <label for="meter_type">Type</label>
+        <select id="meter_type" name="meter_type">
+          {% for t in ['Prepaid', 'Postpaid', 'Three-phase'] %}
+            <option {{ 'selected' if form.meter_type == t }}>{{ t }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div>
+        <label for="initial_reading">Reading today</label>
+        <input type="number" step="0.01" min="0" id="initial_reading" name="initial_reading"
+               value="{{ form.initial_reading or '0' }}">
+      </div>
+    </div>
+    <div class="hint">The reading on the dial now. The first real reading is compared with this one.</div>
+
+    <label for="installed_on">Installed on (optional)</label>
+    <input type="date" id="installed_on" name="installed_on" value="{{ form.installed_on or '' }}">
+
+    <button type="submit">Register meter</button>
+  </form>
+</div>
+{% endblock %}
